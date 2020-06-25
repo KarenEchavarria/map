@@ -1,0 +1,28 @@
+* {
+    margin: 0;
+}
+
+html, body, main {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#search-input{
+    margin: 1vw 1vw 0 1vw;
+    width: 50vw;
+    padding: 0.8vw;
+    border-radius: 0.5vw;
+    font-size: 16px;
+    background: rgb(250, 250, 250);
+}
+
+#map {
+    width: 100%;
+    height: 100%;    
+}
+
+#map div.poi-info-window .view-link {
+    display:none;
+}
+  

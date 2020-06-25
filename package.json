@@ -1,0 +1,20 @@
+{
+  "name": "pruebatecnica-marker",
+  "version": "1.0.0",
+  "description": "Sitio web con mapa para buscar  puntos de interés",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "author": "Karen Echavarria",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4",
+    "prettier": "^2.0.5"
+  }
+}
