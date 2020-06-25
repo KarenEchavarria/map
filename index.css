@@ -1,28 +1,125 @@
 * {
-    margin: 0;
+  margin: 0;
 }
 
-html, body, main {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+html,
+body,
+main {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
-#search-input{
-    margin: 1vw 1vw 0 1vw;
-    width: 50vw;
-    padding: 0.8vw;
-    border-radius: 0.5vw;
-    font-size: 16px;
-    background: rgb(250, 250, 250);
+#search-input {
+  margin: 1vw 1vw 0 1vw;
+  width: 28vw;
+  padding: 0.8vw;
+  border-radius: 0.5vw;
+  font-size: 16px;
+  background: rgb(250, 250, 250);
+}
+
+#suggested-places {
+  display: grid;
+  display: -moz-grid;
+  display: -ms-grid;
+  grid-auto-rows: 18vh;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 18vh;
+  gap: 3vw;
+  justify-content: center;
+  margin: 5vw 0 0 0;
+  width: 30vw;
+  height: 85vh;
+  padding: 0.8vw;
+  position: absolute;
+  z-index: 1;
+  overflow: scroll;
+}
+
+button {
+  color: #ffffff;
+  background-color: #ffffff;
+}
+
+.suggested-item-request {
+  height: 10vh;
+  width: 100%;
+  z-index: 10;
+}
+
+.suggested-item-icon-request {
+  padding: 1vw;
+  height: 10vh;
+  width: inherit;
+  background-repeat: no-repeat;
+  background-size: inherit;
+  background-position: center;
+  border: none;
+}
+
+.suggested-item-name-request {
+  height: 5vh;
+  width: inherit;
+  border: none;
+  font-weight: bold;
+  color: #000000;
+}
+
+.suggested-item-response {
+  grid-column: 1/3;
+  display: flex;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  flex-direction: row;
+  justify-content: space-between;
+  border: 0.2px solid rgb(177, 177, 177);
+  box-shadow: -1px -1px 1px 1.5px rgb(177, 177, 177);
+  height: 15vh;
+}
+
+.suggested-item-cont-response {
+  display: flex;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1vw;
+}
+
+#suggested-item-title-response {
+  font-weight: bold;
+  font-size: 22px;
+  color: #04448d;
+  padding-bottom: 0.5vw;
+}
+
+.suggested-item-address-response {
+  color: #000000;
+  font-size: 16px;
+  padding-bottom: 0.5vw;
+}
+
+.suggested-item-img-response {
+  width: 10vw;
+  height: 99%;
+}
+
+#left-box {
+  width: 32vw;
+  height: 100vh;
+  position: absolute;
+  left: 0;
+  z-index: 1;
+  background: #ffffff;
 }
 
 #map {
-    width: 100%;
-    height: 100%;    
+  width: 100%;
+  height: 100%;
+  background-color: black;
 }
 
 #map div.poi-info-window .view-link {
-    display:none;
+  display: none;
 }
-  
