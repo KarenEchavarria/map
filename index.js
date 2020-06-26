@@ -86,6 +86,8 @@ const SUGGESTED_CATEGORIES_PLACES = [
 ];
 
 window.initMap = () => {
+  let markersArray = [];
+
   navigator.geolocation.getCurrentPosition(
     handleGeolocationSuccess,
     handleGeolocationError,
@@ -133,34 +135,31 @@ window.initMap = () => {
       radius: "1500",
       type: category,
     };
-
+    map.setCenter(center);
     suggestedPlaces.nearbySearch(request, suggestedPlacesResponseHandler);
   }
 
-
-    function makeMarker(position, map) {
-    position.forEach((result) => {
+  function makeMarker(result, map) {
     const marker = new google.maps.Marker({
-
       position: result.geometry.location,
       map: map,
       title: result.name,
-      icon: { url: result.icon, 
-        scaledSize: new google.maps.Size(30, 30) 
-      }
+      icon: { url: result.icon, scaledSize: new google.maps.Size(30, 30) },
     });
+    markersArray = [...markersArray, marker];
     infowindowContent.children["place-name"].textContent = result.name;
     infowindowContent.children["place-address"].textContent = result.vicinity;
-    marker.addListener('click', ()=>infowindow.open(map, marker));  
+    marker.addListener("click", () => infowindow.open(map, marker));
+
     bounds.extend(result.geometry.location);
 
     map.fitBounds(bounds);
-  })
-}
+  }
 
   function suggestedPlacesResponseHandler(results, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
       removeChildNodes("suggested-places");
+      bounds = new google.maps.LatLngBounds();
       results.forEach((result) => {
         const container = document.createElement("div");
         const itemContainer = document.createElement("div");
@@ -193,10 +192,11 @@ window.initMap = () => {
         itemContainer.appendChild(rating);
         if (result.hasOwnProperty("photos")) container.appendChild(img);
         document.getElementById("suggested-places").appendChild(container);
-        makeMarker(results, map); 
+        makeMarker(result, map);
 
-      })
-   } else {
+        console.log(markersArray);
+      });
+    } else {
       alert("no hay lugares registrados en esa ubicación");
     }
   }
@@ -207,6 +207,10 @@ window.initMap = () => {
     while (element.firstChild) {
       element.removeChild(element.firstChild);
     }
+  }
+
+  function removeMarkers() {
+    markersArray.forEach((marker) => marker.setMap(null));
   }
 
   function handleGeolocationSuccess({ coords }) {
@@ -246,8 +250,6 @@ window.initMap = () => {
       map: map,
       visible: false,
     });
-    
-    
     const defaultBounds = new google.maps.LatLngBounds(
       new google.maps.LatLng(center),
       new google.maps.LatLng(center)
@@ -270,13 +272,14 @@ window.initMap = () => {
 
     searchBox.addListener("places_changed", changePlaceInMap);
     function changePlaceInMap() {
-      document.getElementById("left-box").style.zIndex = -1;
-      document.getElementById('map').style.width = "100vw";
+      // document.getElementById("left-box").style.zIndex = -1;
+      // document.getElementById("map").style.width = "100vw";
       removeChildNodes("suggested-places");
-      map.controls[google.maps.ControlPosition.TOP_LEFT].push(
-        document.getElementById("search-input")
-      );
-      marker.setVisible(false)
+      // map.controls[google.maps.ControlPosition.TOP_LEFT].push(
+      //   document.getElementById("search-input")
+      // );
+
+      removeMarkers();
 
       const [place] = searchBox.getPlaces();
 
@@ -296,6 +299,9 @@ window.initMap = () => {
         map.setCenter(place.geometry.location);
         map.setZoom(18);
       }
+
+      displaySuggestedCategoriesPlaces(map, place.geometry.location);
+      console.log(place.geometry.location);
 
       marker.setPosition(place.geometry.location);
       marker.setVisible(true);
