@@ -30,7 +30,7 @@ main {
   justify-content: center;
   margin: 5vw 0 0 0;
   width: 30vw;
-  height: 85vh;
+  height: 80vh;
   padding: 0.8vw;
   position: absolute;
   z-index: 1;
@@ -73,9 +73,10 @@ button {
   display: -ms-flexbox;
   flex-direction: row;
   justify-content: space-between;
+  flex: 2;
+  overflow: auto;
   border: 0.2px solid rgb(177, 177, 177);
   box-shadow: -1px -1px 1px 1.5px rgb(177, 177, 177);
-  height: 15vh;
 }
 
 .suggested-item-cont-response {
@@ -83,8 +84,9 @@ button {
   display: -webkit-flex;
   display: -ms-flexbox;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 1vw;
+  
 }
 
 #suggested-item-title-response {
@@ -115,7 +117,9 @@ button {
 }
 
 #map {
-  width: 100%;
+    position: absolute;
+  right: 0;
+  width: 68vw;
   height: 100%;
   background-color: black;
 }

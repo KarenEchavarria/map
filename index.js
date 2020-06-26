@@ -8,6 +8,11 @@ script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.MAPS_API
 script.defer = true;
 script.async = true;
 
+let map;
+let bounds;
+let infowindow;
+const infowindowContent = document.getElementById("infowindow-content");
+
 const SUGGESTED_CATEGORIES_PLACES = [
   {
     icon:
@@ -80,8 +85,6 @@ const SUGGESTED_CATEGORIES_PLACES = [
   },
 ];
 
-const suggestionsGeometry = [];
-
 window.initMap = () => {
   navigator.geolocation.getCurrentPosition(
     handleGeolocationSuccess,
@@ -108,6 +111,7 @@ window.initMap = () => {
 
       iconButton.addEventListener("click", (e) => {
         e.preventDefault();
+        // getSuggestedPlaces(category.name, center)
         displaySuggestedPlaces(category.name, map, center);
       });
       nameButton.addEventListener("click", (e) => {
@@ -126,41 +130,37 @@ window.initMap = () => {
 
     const request = {
       location: center,
-      radius: "1000",
+      radius: "1500",
       type: category,
     };
 
     suggestedPlaces.nearbySearch(request, suggestedPlacesResponseHandler);
-
-    setTimeout(() => {
-      suggestionsGeometry.forEach((item, index) => {
-        const [coords, name, icon] = item;
-        const position = {
-          lat: coords.location.lat(),
-          lng: coords.location.lng(),
-        };
-        map.setCenter(coords.location);
-        console.log(position, name, icon);
-        makeMarker(position, map, name, icon);
-      });
-    }, 2000);
   }
 
-  function makeMarker(position, map, label = "", icon = "") {
-    console.log(position, "inside makers fuction");
-    const marker1 = new google.maps.Marker({
-      position: position,
+
+    function makeMarker(position, map) {
+    position.forEach((result) => {
+    const marker = new google.maps.Marker({
+
+      position: result.geometry.location,
       map: map,
-      label: label,
-      icon: { url: icon },
+      title: result.name,
+      icon: { url: result.icon, 
+        scaledSize: new google.maps.Size(30, 30) 
+      }
     });
-  }
+    infowindowContent.children["place-name"].textContent = result.name;
+    infowindowContent.children["place-address"].textContent = result.vicinity;
+    marker.addListener('click', ()=>infowindow.open(map, marker));  
+    bounds.extend(result.geometry.location);
+
+    map.fitBounds(bounds);
+  })
+}
 
   function suggestedPlacesResponseHandler(results, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
       removeChildNodes("suggested-places");
-      console.log(results);
-      // console.log(suggestionsGeometry);
       results.forEach((result) => {
         const container = document.createElement("div");
         const itemContainer = document.createElement("div");
@@ -170,11 +170,8 @@ window.initMap = () => {
         const opening = document.createElement("p");
         const img = document.createElement("img");
 
-        results.photos
-          ? (img.src = console.log(results[0].photos[0].getUrl()))
-          : console.log("nada");
-        results[0].hasOwnProperty("photos")
-          ? (img.src = results[0].photos[0].getUrl())
+        result.hasOwnProperty("photos")
+          ? (img.src = result.photos[0].getUrl())
           : (img.src = "");
 
         container.classList.add("suggested-item-response");
@@ -194,16 +191,12 @@ window.initMap = () => {
         itemContainer.appendChild(title);
         itemContainer.appendChild(address);
         itemContainer.appendChild(rating);
-        container.appendChild(img);
+        if (result.hasOwnProperty("photos")) container.appendChild(img);
         document.getElementById("suggested-places").appendChild(container);
+        makeMarker(results, map); 
 
-        suggestionsGeometry.push([
-          results[0].geometry,
-          result.name,
-          result.icon,
-        ]);
-      });
-    } else {
+      })
+   } else {
       alert("no hay lugares registrados en esa ubicación");
     }
   }
@@ -230,7 +223,7 @@ window.initMap = () => {
   }
 
   function renderMap(center) {
-    const map = new google.maps.Map(document.getElementById("map"), {
+    map = new google.maps.Map(document.getElementById("map"), {
       center,
       zoom: 18,
       mapTypeControl: true,
@@ -244,14 +237,17 @@ window.initMap = () => {
       },
       fullscreenControl: false,
     });
+    bounds = new google.maps.LatLngBounds();
+    bounds.extend(center);
+
     displaySuggestedCategoriesPlaces(map, center);
     const marker = new google.maps.Marker({
       position: map.getCenter(),
       map: map,
       visible: false,
     });
-    const infowindow = new google.maps.InfoWindow();
-    const infowindowContent = document.getElementById("infowindow-content");
+    
+    
     const defaultBounds = new google.maps.LatLngBounds(
       new google.maps.LatLng(center),
       new google.maps.LatLng(center)
@@ -264,6 +260,7 @@ window.initMap = () => {
       options
     );
 
+    infowindow = new google.maps.InfoWindow();
     infowindow.setContent(infowindowContent);
 
     // Bias the SearchBox results towards current map's viewport.
@@ -274,10 +271,12 @@ window.initMap = () => {
     searchBox.addListener("places_changed", changePlaceInMap);
     function changePlaceInMap() {
       document.getElementById("left-box").style.zIndex = -1;
+      document.getElementById('map').style.width = "100vw";
       removeChildNodes("suggested-places");
       map.controls[google.maps.ControlPosition.TOP_LEFT].push(
         document.getElementById("search-input")
       );
+      marker.setVisible(false)
 
       const [place] = searchBox.getPlaces();
 
@@ -316,7 +315,6 @@ window.initMap = () => {
         ].join(" ");
       }
 
-      infowindowContent.children["place-icon"].src = place.icon;
       infowindowContent.children["place-name"].textContent = place.name;
       infowindowContent.children["place-address"].textContent = address;
       infowindow.open(map, marker);
