@@ -28,7 +28,7 @@ main {
   grid-template-rows: 18vh;
   gap: 3vw;
   justify-content: center;
-  margin: 5vw 0 0 0;
+  margin: 2vw 0 0 0;
   width: 30vw;
   height: 80vh;
   padding: 0.8vw;
@@ -40,6 +40,7 @@ main {
 button {
   color: #ffffff;
   background-color: #ffffff;
+  outline: none;
 }
 
 .suggested-item-request {
@@ -86,7 +87,6 @@ button {
   flex-direction: column;
   justify-content: flex-start;
   padding: 1vw;
-  
 }
 
 #suggested-item-title-response {
@@ -117,7 +117,7 @@ button {
 }
 
 #map {
-    position: absolute;
+  position: absolute;
   right: 0;
   width: 68vw;
   height: 100%;
@@ -125,5 +125,19 @@ button {
 }
 
 #map div.poi-info-window .view-link {
+  display: none;
+}
+
+.left-arrow {
+  color: #000000;
+  font-size: 70px;
+  font-weight: 900;
+  border: none;
+  margin: -3vh, 0 0 0;
+  padding: 0;
+  z-index: -3;
+}
+
+.hidden {
   display: none;
 }

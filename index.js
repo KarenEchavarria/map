@@ -113,11 +113,12 @@ window.initMap = () => {
 
       iconButton.addEventListener("click", (e) => {
         e.preventDefault();
-        // getSuggestedPlaces(category.name, center)
+        removeMarkers();
         displaySuggestedPlaces(category.name, map, center);
       });
       nameButton.addEventListener("click", (e) => {
         e.preventDefault();
+        removeMarkers();
         displaySuggestedPlaces(category.name, map, center);
       });
 
@@ -137,6 +138,19 @@ window.initMap = () => {
     };
     map.setCenter(center);
     suggestedPlaces.nearbySearch(request, suggestedPlacesResponseHandler);
+
+    removeChildNodes("suggested-places");
+
+    document.getElementsByClassName("left-arrow")[0].classList.remove("hidden");
+    document
+      .getElementsByClassName("left-arrow")[0]
+      .addEventListener("click", () => {
+        document
+          .getElementsByClassName("left-arrow")[0]
+          .classList.add("hidden");
+        removeChildNodes("suggested-places");
+        displaySuggestedCategoriesPlaces(map, center);
+      });
   }
 
   function makeMarker(result, map) {
@@ -146,7 +160,7 @@ window.initMap = () => {
       title: result.name,
       icon: { url: result.icon, scaledSize: new google.maps.Size(30, 30) },
     });
-    markersArray = [...markersArray, marker];
+    markersArray = [...markersArray, [result.place_id, marker]];
     infowindowContent.children["place-name"].textContent = result.name;
     infowindowContent.children["place-address"].textContent = result.vicinity;
     marker.addListener("click", () => infowindow.open(map, marker));
@@ -154,6 +168,17 @@ window.initMap = () => {
     bounds.extend(result.geometry.location);
 
     map.fitBounds(bounds);
+  }
+
+  function animateMarker(markerID) {
+    const [selectedMarker] = markersArray.filter(
+      (marker) => marker[0] === markerID
+    );
+
+    selectedMarker[1].setAnimation(google.maps.Animation.BOUNCE);
+    selectedMarker[1].addListener("click", () =>
+      selectedMarker[1].setAnimation(null)
+    );
   }
 
   function suggestedPlacesResponseHandler(results, status) {
@@ -186,6 +211,10 @@ window.initMap = () => {
         address.innerText = result.vicinity;
         rating.innerText = `Puntuación de los usuarios: ${result.rating}`;
 
+        container.addEventListener("click", () =>
+          animateMarker(result.place_id)
+        );
+
         container.appendChild(itemContainer);
         itemContainer.appendChild(title);
         itemContainer.appendChild(address);
@@ -193,8 +222,6 @@ window.initMap = () => {
         if (result.hasOwnProperty("photos")) container.appendChild(img);
         document.getElementById("suggested-places").appendChild(container);
         makeMarker(result, map);
-
-        console.log(markersArray);
       });
     } else {
       alert("no hay lugares registrados en esa ubicación");
